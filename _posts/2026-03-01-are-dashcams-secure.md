@@ -37,12 +37,13 @@ Like home routers and IP cameras, dashcams now belong to the broader **automotiv
 
 ---
 
-# Case Study: Reverse engineering Ubox Dashcam
+# Case Study: Reverse Engineering Ubox Dashcam
 
 In this case study we will be inspecting the Ubox dashcam from Application and features to it's hardware and figure out how secure is it 
 
 ## Ubox dashcam features
- **Image the dashcam
+
+![dashcam1](https://github.com/user-attachments/assets/754aa091-e103-4fac-9ed7-e8bf790accab)
  
 The **Ubox** is a compact automotive dashcam designed for continuous recording and smartphone integration.
 
@@ -66,6 +67,35 @@ The **Ubox** is a compact automotive dashcam designed for continuous recording a
 
 These features enhance user experience — **but also increase potential security exposure.**
 
+## What's next?
+
+As an embedded security researcher, I prefer to approach from the hardware layer and moving upward to the application layer. Beginning with physical interfaces, exposed debug ports, and chipset identification, before progressing to firmware extraction and analysis, network, and mobile application.
+
+Usually I buy two identical devices, so I can go full destricative on the first one if needed. 
+
+first glance from the outside we see
+
+> **TF card is a SD card that we will be using later.**
+
+![car-camera](https://github.com/user-attachments/assets/90a3d522-976a-41f4-a74a-1e7fa9815038)
+
+---
+
+This is what looks like from inside 
+![inside1](https://github.com/user-attachments/assets/4c0c1455-581a-400a-a4c6-0be444de922b)
+
+Interesting 4 golden dots
+
+---
+![inside2](https://github.com/user-attachments/assets/f808162b-3454-45c2-a0d6-294b30e5939b)
+
+
+Seems like a UART let's connect to them using [PCBBite](https://sensepeek.com/pcbite-20-1) and [Tigard](https://www.crowdsupply.com/securinghw/tigard)
+
+![connect](https://github.com/user-attachments/assets/85c55f97-3b80-4b95-b17f-f0db711c1591)
+
+
+
 ---
 
 
@@ -74,72 +104,3 @@ These features enhance user experience — **but also increase potential securit
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## ⚠️ Why Security Matters
-
-When a dashcam includes Wi-Fi and mobile connectivity, it introduces multiple security considerations:
-
-- Weak or default passwords
-- Open Wi-Fi access points
-- Unencrypted data transmission
-- Insecure firmware update mechanisms
-- Exposed GPS and location data
-- Cloud storage misconfigurations
-
-If poorly secured, a dashcam could:
-
-- Leak private driving footage
-- Reveal location history
-- Be remotely accessed without authorization
-- Serve as a potential pivot point into other connected vehicle systems (advanced attack scenario)
-
----
-
-## 🧠 The Bigger Picture
-
-Modern dashcams are no longer standalone recorders.
-
-They are:
-
-- Embedded Linux-based systems (in many cases)
-- Network-enabled IoT devices
-- Continuous data collectors
-- Potential forensic evidence sources
-
-From a cybersecurity perspective, evaluating dashcam security requires analysis across:
-
-- Hardware layer
-- Firmware integrity
-- Network services
-- Mobile application security
-- Cloud backend architecture
-
----
-
-## 🚀 What This Blog Will Explore
-
-In this series, we will examine:
-
-- How secure consumer dashcams really are
-- Common IoT vulnerabilities found in similar devices
-- How to test dashcams from a security perspective
-- Practical recommendations for safer deployment
-
-Because convenience should never come at the expense of security.
