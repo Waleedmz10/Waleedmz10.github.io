@@ -130,9 +130,33 @@ No password. No authentication of any kind. The UART interface drops straight in
 
 UART is a physical interface, so an attacker needs the device in hand. That is a meaningful limitation, however in our case, UART is just the first door. It is how we discovered the real problem. The root shell lets us poke around the filesystem and reverse engineer some interesting binaries — and that is where things get much worse.
 
+---
 
+## Poking Around the Filesystem
+ 
+With a root shell, the next step is the usual embedded-Linux tour: what is running, what is mounted, and what is on filesystem.
 
+Two things to note up front:
+ 
+- The SD card is mounted at `/tmp/mnt/sdcard` as **vfat** — no encryption, no access control, readable and writable by anyone who pops the card into a laptop.
+- One userspace process is doing most of the work. It handles recording, the GPS overlay, the Wi-Fi/app interface, button input, and the OBD data pipeline. Basically, it *is* the dashcam.
+If there is a vulnerability on this device, it is overwhelmingly likely to live in that single monolithic binary. So let's pull it off the device and open it in IDA.
 
+---
+
+## Reverse Engineering the Main Binary
+ 
+After copying the binary off over the SDcard then went straight for the low-hanging fruit: to `system()`**. On an embedded Linux binary, `system()` calls are almost always where the interesting (and dangerous) stuff lives — shelling out to external tools, running scripts, launching daemons. It is a short list of places to read, and each one is a potential command-injection or arbitrary-execution sink.
+
+Walking through the `system()` xrefs, one large initialization function immediately stood out:
+
+<img width="1370" height="129" alt="system__" src="https://github.com/user-attachments/assets/0df35208-3080-4c3d-b9e6-ea07957ae300" />
+
+### Every branch hands execution to `system()` as root
+ 
+The dashcam's main process runs as root (we confirmed that earlier with `id`). Every `system()` call here inherits that privilege. So does every child process. So does every shell command in every script that those children execute. Full root, no sandboxing, no privilege separation.
+
+**`/tmp/mnt/sdcard/debug.sh`** — the shell-script autorun. Drop a `.sh` with a specific name on the SD card and it runs as root on every boot. This is the one I used for the PoC. 
 
 
 
