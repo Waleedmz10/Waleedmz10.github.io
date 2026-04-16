@@ -225,18 +225,16 @@ That means the device has, by design, a hardware path to the internal vehicle ne
 I have **not tested CAN injection on this device.** I did not trace the OBD wiring through the board, I did not reverse the CAN transceiver path, and I have not sent a single frame onto a live vehicle bus. That is a separate research project with its own ethical and legal weight, and it belongs on a test vehicle in a controlled environment — not on a public road in someone else's car.
 
 The industry spent the last decade — from the 2015 Jeep Cherokee remote hack onwards — learning that **anything wired into the CAN bus is part of the car's trust boundary**. A sub-$100 IoT device with an unauthenticated autorun from removable storage should not be sitting inside that boundary. And yet here we are.
- 
-> **A dashcam that can be compromised with a file on an SD card, and that is wired into the car's internal network, is not a recording device. It is a foothold.**
 
 ---
 
 ## What This Means
 
-For drivers: treat the SD card that came in the box as untrusted. Format it before first use. If the dashcam offers an OBD-II cable, consider whether you actually need it — the cigarette-lighter adapter trades some features for isolation from the CAN bus.
+**For drivers:** treat the SD card that came in the box as untrusted. Format it before first use. If the dashcam offers an OBD-II cable, consider whether you actually need it — the cigarette-lighter adapter trades some features for isolation from the CAN bus.
 
-For vendors: do not execute unsigned code from removable storage. Do not ship 2026 products on a Linux kernel that has been end-of-life since 2017. Publish a security contact.
+**For vendors:** do not execute unsigned code from removable storage. Do not ship 2026 products on a Linux kernel that has been end-of-life since 2017. Publish a security contact.
 
-For the industry: a sub-$100 IoT device with no authentication should not be sitting inside the trust boundary of a moving vehicle. We spent the 2010s learning this lesson with infotainment systems. Dashcams are the next chapter.
+**For the industry:** a sub-$100 IoT device with no authentication should not be sitting inside the trust boundary of a moving vehicle. We spent the 2010s learning this lesson with infotainment systems. Dashcams are the next chapter.
  
 ---
 
