@@ -95,8 +95,41 @@ Seems like a UART let's connect to them using [PCBBite](https://sensepeek.com/pc
 ![connect](https://github.com/user-attachments/assets/85c55f97-3b80-4b95-b17f-f0db711c1591)
 
 
-
 ---
+
+## UART Access
+ 
+Rather than soldering, I used **PCBite** spring-loaded probes on the four golden pads. It keeps the board intact and, more importantly, lets me move probes around quickly while I am still figuring out which pad is which.
+ 
+After identifying the pinout (GND, TX, RX) and sweeping common baud rates, **115200** gave clean output. Power-cycling the dashcam streams the full boot log over serial.
+ 
+<img width="1086" height="775" alt="UART_log" src="https://github.com/user-attachments/assets/6fa2472c-7f61-4704-93be-aadf0e46f55b" />
+
+A few things immediately jump out of the boot log:
+ 
+```
+Linux version 3.10.14-Zeratul-Archon (huanggexiang@dell-Precision
+-Tower-3431) (gcc version 5.4.0 (Ingenic r3.3.7.mxu2-gcc540 ...)
+ Jun 19 09:11:56 CST 2025
+Ingenic Kernel-3.10 version H20250113a
+CPU0 revision is: 00d00100 (Ingenic Xburst)
+CCLK:1200MHz L2CLK:600Mhz H0CLK:225MHz H2CLK:225MHz PCLK:112Mhz
+```
+
+This tells us a lot in a few lines:
+ 
+- The SoC is an **Ingenic Xburst** — a MIPS-based chip that shows up in a lot of low-cost IP cameras, dashcams, and cheap Android devices. Cheap, capable, and not known for strong security defaults.
+- The kernel is **Linux 3.10.14**. Linux 3.10 reached end-of-life in **November 2017** — this device is shipping in 2026 on a kernel that has not received upstream security fixes in nearly a decade.
+
+
+Boot finishes asks for a user just write "root". And then this:
+
+<img width="933" height="180" alt="root" src="https://github.com/user-attachments/assets/df0b9343-5d48-42d7-a57d-863ffb90720f" />
+
+No password. No authentication of any kind. The UART interface drops straight into a **root shell**
+
+UART is a physical interface, so an attacker needs the device in hand. That is a meaningful limitation, however in our case, UART is just the first door. It is how we discovered the real problem. The root shell lets us poke around the filesystem and reverse engineer some interesting binaries — and that is where things get much worse.
+
 
 
 
