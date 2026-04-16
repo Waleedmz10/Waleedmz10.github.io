@@ -216,7 +216,7 @@ The GPS module is continuously feeding the main process for the on-video overlay
 
 #### The CAN bus — the scariest possibility
  
-This is where this research stops being a privacy story and starts being a safety story.
+**This is where this research stops being a privacy story and starts being a safety story.**
  
 This dashcam is powered from the vehicle's **OBD-II port**. OBD-II is not just a power connector — it is a physical tap into the **CAN bus**, the network that carries messages between the engine control unit, transmission, brakes, airbags, and, on modern cars, driver-assistance systems. The dashcam legitimately uses this connection to read vehicle data (speed, RPM, etc.) for its overlays.
  
