@@ -5,7 +5,13 @@ date: 2026-04-16
 categories: Cybersecurity IoT Automotive
 ---
 
-# Root on Wheels: Hacking a Connected Dashcam
+> ## TL;DR
+>
+> - A popular connected dashcam runs unsigned code from its SD card, as root, every time the car starts.
+> - I demonstrated the attack by getting the dashcam to send its own photos — including embedded GPS coordinates, speed, and timestamp — to a Discord channel I control.
+> - Most dashcams ship with an SD card already in the box. Almost no one checks it before use. That is the delivery mechanism.
+> - The same device is wired into the car's OBD-II / CAN bus, meaning a compromised dashcam is a foothold inside the vehicle's internal network (if the data lines are connected).
+> - **The takeaway:** A connected dashcam is not a camera. It is a Linux computer with your GPS, your microphone, and a cable into your car's nervous system — and this one has no meaningful security boundary.
 
 ## Introduction
 
@@ -13,9 +19,7 @@ Dashcams have rapidly evolved from simple in-car recording devices into connecte
 
 While these features improve usability and convenience, they also introduce cybersecurity risks.
 
-This raises a critical question:
-
-> **Are dashcams secure, or are they just another vulnerable IoT device on wheels?**
+> **"These are no longer just cameras. They are small Linux computers, wired into your car, watching and listening." **
 
 ---
 
@@ -39,7 +43,7 @@ Like home routers and IP cameras, dashcams now belong to the broader **automotiv
 
 # Case Study: Reverse Engineering Ubox Dashcam
 
-In this case study we will be inspecting the Ubox dashcam from Application and features to it's hardware and figure out how secure is it 
+In this case study, we inspect the Ubox dashcam from the application layer down to the hardware — and find out how secure it really is.
 
 ## Ubox dashcam features
 
@@ -69,11 +73,11 @@ These features enhance user experience — **but also increase potential securit
 
 ## What's next?
 
-As an embedded security researcher, I prefer to approach from the hardware layer and moving upward to the application layer. Beginning with physical interfaces, exposed debug ports, and chipset identification, before progressing to firmware extraction and analysis, network, and mobile application.
+As an embedded security researcher, I prefer to start at the hardware layer and work upward toward the application layer. Beginning with physical interfaces, exposed debug ports, and chipset identification, before progressing to firmware extraction and analysis, network, and mobile application.
 
-Usually I buy two identical devices, so I can go full destricative on the first one if needed. 
+Usually I buy two identical devices so I can go fully destructive on the first one if needed.
 
-first glance from the outside we see
+At first glance from the outside, we see:
 
 > **TF card is a SD card that we will be using later.**
 
@@ -122,11 +126,11 @@ This tells us a lot in a few lines:
 - The kernel is **Linux 3.10.14**. Linux 3.10 reached end-of-life in **November 2017** — this device is shipping in 2026 on a kernel that has not received upstream security fixes in nearly a decade.
 
 
-Boot finishes asks for a user just write "root". And then this:
+When boot finishes, it asks for a username. Just type root — no password. And then this:
 
 <img width="933" height="180" alt="root" src="https://github.com/user-attachments/assets/df0b9343-5d48-42d7-a57d-863ffb90720f" />
 
-No password. No authentication of any kind. The UART interface drops straight into a **root shell**
+No password. No authentication of any kind. The UART interface drops straight into a **root shell**.
 
 UART is a physical interface, so an attacker needs the device in hand. That is a meaningful limitation, however in our case, UART is just the first door. It is how we discovered the real problem. The root shell lets us poke around the filesystem and reverse engineer some interesting binaries — and that is where things get much worse.
 
@@ -134,7 +138,7 @@ UART is a physical interface, so an attacker needs the device in hand. That is a
 
 ## Poking Around the Filesystem
  
-With a root shell, the next step is the usual embedded-Linux tour: what is running, what is mounted, and what is on filesystem.
+With a root shell, the next step is the usual embedded-Linux tour: what is running, what is mounted, and what is on the filesystem.
 
 Two things to note up front:
  
@@ -146,7 +150,7 @@ If there is a vulnerability on this device, it is overwhelmingly likely to live 
 
 ## Reverse Engineering the Main Binary
  
-After copying the binary off over the SDcard then went straight for the low-hanging fruit: to `system()`**. On an embedded Linux binary, `system()` calls are almost always where the interesting (and dangerous) stuff lives — shelling out to external tools, running scripts, launching daemons. It is a short list of places to read, and each one is a potential command-injection or arbitrary-execution sink.
+After copying the binary over the SDcard then went straight for the low-hanging fruit: to `system()`**. On an embedded Linux binary, `system()` calls are almost always where the interesting (and dangerous) stuff lives — shelling out to external tools, running scripts, launching daemons. It is a short list of places to read, and each one is a potential command-injection or arbitrary-execution sink.
 
 Walking through the `system()` xrefs, one large initialization function immediately stood out:
 
@@ -168,7 +172,7 @@ Once you have "drop a file on the SD card and it runs as root on boot," the ques
  
 To demonstrate impact, I wrote a short shell script, saved it to the SD card under the magic filename, and put the card back in the dashcam. On the next boot, the main process executed the script as root with zero user interaction.
  
-The payload is deliberately simple: wait for the device to finish initializing, grab the most recent snapshot it has captured, and send it to a Discord channel I control via a webhook
+The payload is deliberately simple: wait for the device to finish initializing, grab the most recent snapshot it has captured, and send it to a Discord channel I control via a webhook.
 
 <img width="1296" height="783" alt="POC" src="https://github.com/user-attachments/assets/293a36e1-0182-42d3-8ee2-da7dbdc521ff" />
 
@@ -179,6 +183,7 @@ And this is where the dashcam itself does most of the attacker's work. Look at t
 - **Exact date and time** (`2026-04-16 21:18:46`)
 - **GPS coordinates** (latitude and longitude, burned directly into the pixels)
 - **Vehicle speed** (`0 MPH` in the stationary test, but it updates live)
+  
 No EXIF parsing, no metadata extraction, nothing fancy. The dashcam helpfully renders the victim's exact location onto every image it saves, and then saves those images to an SD card it runs unsigned code from. A single frame is enough to know **where the car is, when it was there, and how fast it was going** — all without the owner ever noticing the SD card was touched.
 
 ### How a Real Victim Would Actually Get Hit
@@ -222,6 +227,16 @@ I have **not tested CAN injection on this device.** I did not trace the OBD wiri
 The industry spent the last decade — from the 2015 Jeep Cherokee remote hack onwards — learning that **anything wired into the CAN bus is part of the car's trust boundary**. A sub-$100 IoT device with an unauthenticated autorun from removable storage should not be sitting inside that boundary. And yet here we are.
  
 > **A dashcam that can be compromised with a file on an SD card, and that is wired into the car's internal network, is not a recording device. It is a foothold.**
+
+---
+
+## What This Means
+
+For drivers: treat the SD card that came in the box as untrusted. Format it before first use. If the dashcam offers an OBD-II cable, consider whether you actually need it — the cigarette-lighter adapter trades some features for isolation from the CAN bus.
+
+For vendors: do not execute unsigned code from removable storage. Do not ship 2026 products on a Linux kernel that has been end-of-life since 2017. Publish a security contact.
+
+For the industry: a sub-$100 IoT device with no authentication should not be sitting inside the trust boundary of a moving vehicle. We spent the 2010s learning this lesson with infotainment systems. Dashcams are the next chapter.
  
 ---
 
