@@ -19,7 +19,7 @@ Dashcams have rapidly evolved from simple in-car recording devices into connecte
 
 While these features improve usability and convenience, they also introduce cybersecurity risks.
 
-> **"These are no longer just cameras. They are small Linux computers, wired into your car, watching and listening." **
+> "**These are no longer just cameras. They are small Linux computers, wired into your car, watching and listening.**" 
 
 ---
 
