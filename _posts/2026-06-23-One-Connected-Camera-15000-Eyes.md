@@ -5,7 +5,9 @@ date: 2026-06-23
 tags: [hardware, iot, connected-camera, uart, uboot, firmware, rtsp, reverse-engineering]
 ---
 
+
 <img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/a7f1213c-853c-4c53-9f9b-45346c131b0b" />
+
 
 
 > ## TL;DR
@@ -42,11 +44,23 @@ That clean result is exactly why the hardware matters. "We couldn't break in ove
 
 Off came the screws. On the board, the parts that matter:
 
-**Pic of the board with the flash (ToDo)
+<img width="781" height="1200" alt="Open_Camera" src="https://github.com/user-attachments/assets/4dc2ba28-09a7-4d49-bfc7-9dee6e731b66" />
 
-- **The main chip (SoC)** — the brain. It runs Linux and handles the video, the network, and the streaming.
-- **The memory chip (flash)** — holds the startup code, the system, and the files.
-- **A UART** — a small set of pins that lets you watch the device "talk" as it starts up, like a debug window.
+
+From the main PCB (Top view)
+
+<img width="1000" height="918" alt="MAin_PCB_TOP" src="https://github.com/user-attachments/assets/df9b7601-4f91-4a9f-8e34-34dfa34c6d80" />
+
+- **The main chip (SoC) [Red rectangle]** — the brain. It runs Linux and handles the video, the network, and the streaming.
+- **A UART pins [Yellow rectangle]** — a small set of pins that lets you watch the device "talk" as it starts up, like a debug window.
+
+From the main PCB (bottom view)
+
+<img width="1000" height="1400" alt="Main_PCB_Bottom" src="https://github.com/user-attachments/assets/9a35e5cd-4aae-457f-99d2-28a464769073" />
+
+
+- **The memory chip (flash) [Red rectangle]** — holds the startup code, the system, and the files.
+
 
 I connected to the UART and watched the startup messages. Two things were clear, and both were annoying:
 
