@@ -5,6 +5,9 @@ date: 2026-06-23
 tags: [hardware, iot, connected-camera, uart, uboot, firmware, rtsp, reverse-engineering]
 ---
 
+<img width="1200" height="800" alt="image" src="https://github.com/user-attachments/assets/a7f1213c-853c-4c53-9f9b-45346c131b0b" />
+
+
 > ## TL;DR
 >
 > - I tested an internet-connected camera. From the its app and network, I found no vulnerabilities.
@@ -21,7 +24,7 @@ After [Root on Wheels](https://waleedmz10.github.io/cybersecurity/iot/automotive
 
 That jump from "one device" to "the whole product line" is the main idea of this post. The hardware work is how I got there; the scale is the point.
 
-(I'm keeping the brand and model private until the fix is out)
+(I'm keeping the brand and model private until the fix)
 
 ## Step 0 — The boring part: testing from the app & network (nothing found)
 
