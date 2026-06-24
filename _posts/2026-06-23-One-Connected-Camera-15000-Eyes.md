@@ -5,7 +5,7 @@ date: 2026-06-23
 tags: [hardware, iot, connected-camera, uart, uboot, firmware, rtsp, reverse-engineering]
 ---
 
-<img width="1200" height="800" alt="image" src="https://github.com/user-attachments/assets/a7f1213c-853c-4c53-9f9b-45346c131b0b" />
+<img width="800" height="600" alt="image" src="https://github.com/user-attachments/assets/a7f1213c-853c-4c53-9f9b-45346c131b0b" />
 
 
 > ## TL;DR
