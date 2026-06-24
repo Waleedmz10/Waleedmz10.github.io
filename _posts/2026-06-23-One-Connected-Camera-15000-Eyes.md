@@ -64,12 +64,19 @@ From the main PCB (bottom view)
 
 I connected to the UART and watched the startup messages. Two things were clear, and both were annoying:
 
-- The bootloader (U-Boot) was locked with a password when interrupting it. Pic (ToDo)
-- The normal login was also locked with a password I didn't have. Pic (ToDo)
+<img width="960" height="1280" alt="UART_connection" src="https://github.com/user-attachments/assets/e1cad180-2af6-4a15-ad14-2ba292767930" />
+
+- The bootloader (U-Boot) was locked with a password when interrupting it.
+
+  <img width="615" height="936" alt="uboot_password" src="https://github.com/user-attachments/assets/225b1b10-fb81-4052-ac55-ddf3154b32d0" />
+
+- The normal login was also locked with a password I didn't have.
+
+  <img width="1002" height="1012" alt="root_shell" src="https://github.com/user-attachments/assets/25f02719-c330-4aee-a3c6-be1883983137" />
 
 So the easy path was closed. The device was basically telling me to go get the firmware!
 
-> 📷 Screenshot 2 — labeled photo of the board: main chip, memory chip, UART.
+
 > 📷 Screenshot 3 — the UART hooked up on the bench, with the password prompts showing on screen.
 
 ## Step 2 — Pulling the memory chip and copying it
