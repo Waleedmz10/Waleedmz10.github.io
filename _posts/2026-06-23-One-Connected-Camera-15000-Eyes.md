@@ -76,21 +76,27 @@ I connected to the UART and watched the startup messages. Two things were clear,
 
 So the easy path was closed. The device was basically telling me to go get the firmware!
 
-
-> 📷 Screenshot 3 — the UART hooked up on the bench, with the password prompts showing on screen.
-
-## Step 2 — Pulling the memory chip and copying it
+## Step 2 — Pulling the firmware from flash chip 
 
 If the device won't talk, take its firmware. I carefully unsoldered the flash chip, put it on a reader, and copied everything off it into one file.
 
-A clean, complete copy matters a lot here — a bad copy will look like random errors later and waste hours. So I read it twice and checked that both copies matched before moving on.
+<img width="831" height="773" alt="Desoldring" src="https://github.com/user-attachments/assets/993b7dcc-feaf-4238-b51e-b29e26bba0d5" />
 
-> 📷 Screenshot 4 — the removed memory chip on the reader.
-> 📷 Screenshot 5 — the copy finishing, and the two checks matching.
+<img width="1508" height="836" alt="reading_flash" src="https://github.com/user-attachments/assets/4746e41d-3bb0-4127-a0d9-df52efc36a53" />
+
+A clean, complete copy matters a lot here — a bad copy will look like random errors later and waste hours. So I read it twice and checked that both copies matched before moving on.
 
 ## Step 3 — Rebuilding the files (binwalk + the startup log)
 
 With the raw copy in hand, I used a tool called binwalk to split it into its parts. I lined those parts up against the startup log from the UART (which helpfully prints the names and locations of each part) so I wasn't guessing:
+
+From the UART while booting:
+
+<img width="657" height="412" alt="MTD_sectors" src="https://github.com/user-attachments/assets/93e87b77-4683-4900-a1af-4ff9481a7dac" />
+
+From the binwalk after reading the firmware:
+
+<img width="1422" height="661" alt="Binwalk_Desoldered" src="https://github.com/user-attachments/assets/64e28790-96f6-41d1-87a5-7f44d4b633b7" />
 
 - the bootloader (U-Boot),
 - the system core (kernel),
@@ -99,8 +105,6 @@ With the raw copy in hand, I used a tool called binwalk to split it into its par
 
 The startup log is underrated — the device basically hands you a map of its own memory every time you power it on. Pairing that map with binwalk removed almost all the guesswork.
 
-> 📷 Screenshot 6 — binwalk output showing the parts it found.
-> 📷 Screenshot 7 — the startup log showing the memory map (blur anything you don't want public).
 
 ## Step 4 — Finding the bootloader password
 
