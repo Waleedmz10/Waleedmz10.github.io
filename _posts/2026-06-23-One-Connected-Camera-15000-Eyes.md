@@ -12,7 +12,7 @@ tags: [hardware, iot, connected-camera, uart, uboot, firmware, rtsp, reverse-eng
 
 > ## TL;DR
 >
-> - I tested an internet-connected camera. From the its app and network, I found no vulnerabilities.
+> - I tested an internet-connected camera. From its app and network, I found no vulnerabilities.
 > - So I opened it up and worked on the hardware parts. I pulled the memory chip off the board and copied everything on it.
 > - Inside that copy I found the bootloader (the first code that runs) was locked with a password — but the password was written right into the code, the same on every device.
 > - That password let me unlock the device and, with a small trick on a writable part of the memory, change the admin password and get full control (root).
@@ -44,19 +44,19 @@ That clean result is exactly why the hardware matters. "We couldn't break in ove
 
 Off came the screws. On the board, the parts that matter:
 
-<img width="781" height="1200" alt="Open_Camera" src="https://github.com/user-attachments/assets/4dc2ba28-09a7-4d49-bfc7-9dee6e731b66" />
+<img width="381" height="800" alt="Open_Camera" src="https://github.com/user-attachments/assets/4dc2ba28-09a7-4d49-bfc7-9dee6e731b66" />
 
 
-From the main PCB (Top view)
+From the Main PCB — top view
 
-<img width="1000" height="918" alt="MAin_PCB_TOP" src="https://github.com/user-attachments/assets/df9b7601-4f91-4a9f-8e34-34dfa34c6d80" />
+<img width="600" height="418" alt="MAin_PCB_TOP" src="https://github.com/user-attachments/assets/df9b7601-4f91-4a9f-8e34-34dfa34c6d80" />
 
 - **The main chip (SoC) [Red rectangle]** — the brain. It runs Linux and handles the video, the network, and the streaming.
-- **A UART pins [Yellow rectangle]** — a small set of pins that lets you watch the device "talk" as it starts up, like a debug window.
+- **UART pins [Yellow rectangle]** — a small set of pins that lets you watch the device "talk" as it starts up, like a debug window.
 
-From the main PCB (bottom view)
+From the Main PCB — bottom view
 
-<img width="1000" height="1400" alt="Main_PCB_Bottom" src="https://github.com/user-attachments/assets/9a35e5cd-4aae-457f-99d2-28a464769073" />
+<img width="500" height="900" alt="Main_PCB_Bottom" src="https://github.com/user-attachments/assets/9a35e5cd-4aae-457f-99d2-28a464769073" />
 
 
 - **The memory chip (flash) [Red rectangle]** — holds the startup code, the system, and the files.
@@ -64,7 +64,7 @@ From the main PCB (bottom view)
 
 I connected to the UART and watched the startup messages. Two things were clear, and both were annoying:
 
-<img width="960" height="1280" alt="UART_connection" src="https://github.com/user-attachments/assets/e1cad180-2af6-4a15-ad14-2ba292767930" />
+<img width="560" height="880" alt="UART_connection" src="https://github.com/user-attachments/assets/e1cad180-2af6-4a15-ad14-2ba292767930" />
 
 - The bootloader (U-Boot) was locked with a password when interrupting it.
 
@@ -72,17 +72,17 @@ I connected to the UART and watched the startup messages. Two things were clear,
 
 - The normal login was also locked with a password I didn't have.
 
-  <img width="1002" height="1012" alt="root_shell" src="https://github.com/user-attachments/assets/25f02719-c330-4aee-a3c6-be1883983137" />
+  <img width="802" height="812" alt="root_shell" src="https://github.com/user-attachments/assets/25f02719-c330-4aee-a3c6-be1883983137" />
 
 So the easy path was closed. The device was basically telling me to go get the firmware!
 
-## Step 2 — Pulling the firmware from flash chip 
+## Step 2 — Pulling the firmware from the flash chip 
 
 If the device won't talk, take its firmware. I carefully unsoldered the flash chip, put it on a reader, and copied everything off it into one file.
 
-<img width="831" height="773" alt="Desoldring" src="https://github.com/user-attachments/assets/993b7dcc-feaf-4238-b51e-b29e26bba0d5" />
+<img width="657" height="412" alt="Desoldring" src="https://github.com/user-attachments/assets/993b7dcc-feaf-4238-b51e-b29e26bba0d5" />
 
-<img width="1508" height="836" alt="reading_flash" src="https://github.com/user-attachments/assets/4746e41d-3bb0-4127-a0d9-df52efc36a53" />
+<img width="657" height="412" alt="reading_flash" src="https://github.com/user-attachments/assets/4746e41d-3bb0-4127-a0d9-df52efc36a53" />
 
 A clean, complete copy matters a lot here — a bad copy will look like random errors later and waste hours. So I read it twice and checked that both copies matched before moving on.
 
@@ -96,7 +96,7 @@ From the UART while booting:
 
 From the binwalk after reading the firmware:
 
-<img width="1422" height="661" alt="Binwalk_Desoldered" src="https://github.com/user-attachments/assets/64e28790-96f6-41d1-87a5-7f44d4b633b7" />
+<img width="657" height="412" alt="Binwalk_Desoldered" src="https://github.com/user-attachments/assets/64e28790-96f6-41d1-87a5-7f44d4b633b7" />
 
 - the bootloader (U-Boot),
 - the system core (kernel),
@@ -112,7 +112,7 @@ Now the system files and the bootloader were sitting on my computer, fully reada
 
 It was about as bad as it gets: the password was written straight into the code — the same on every single device of this type. No per-device value, nothing unique. One password, everywhere.
 
-<img width="1378" height="857" alt="RE_password" src="https://github.com/user-attachments/assets/87762c61-22ae-4e45-a0cc-1426b505b308" />
+<img width="878" height="357" alt="RE_password" src="https://github.com/user-attachments/assets/87762c61-22ae-4e45-a0cc-1426b505b308" />
 
 ## Step 5 — Getting in, but only halfway
 
@@ -155,11 +155,11 @@ This is the moment everything changes. Up to here I needed a screwdriver, a sold
 
 **Note on what I'm sharing:** I'll describe the kind of bug (a hidden video link with no password), but I'm not publishing the exact link while devices are still online.
 
-I opened VLC media player and connected to my camera (That is protected with a password) with the link I found:
+I opened VLC media player and connected to my camera (Which is protected with a password) with the link I found:
 
-<img width="896" height="657" alt="VLC_open" src="https://github.com/user-attachments/assets/17415f73-50c7-4afa-9909-680a640527d3" />
+<img width="596" height="357" alt="VLC_open" src="https://github.com/user-attachments/assets/17415f73-50c7-4afa-9909-680a640527d3" />
 
-<img width="1662" height="932" alt="live_screenshot" src="https://github.com/user-attachments/assets/d8c3a700-81da-42b1-9dbb-352c1d76e921" />
+<img width="662" height="332" alt="live_screenshot" src="https://github.com/user-attachments/assets/d8c3a700-81da-42b1-9dbb-352c1d76e921" />
 
 ## Step 9 — One spelling mistake, fifteen thousand devices
 
@@ -180,7 +180,7 @@ To be totally clear: every step involving full control, the no-password video li
 
 ## Why this matters: these devices are a real, ongoing danger
 
-The point of this post isn't "a camera device had a bug." The point is that this kind of connected camera is a real, large-scale danger to the people/entities who own it — and most owners have no idea. Multiply that by 15,000 identical devices and it stops being a curiosity and becomes a privacy disaster at a huge scale.
+The point of this post isn't "a camera had a bug." The point is that this kind of connected camera is a real, large-scale danger to the people/entities who own it — and most owners have no idea. Multiply that by 15,000 identical devices and it stops being a curiosity and becomes a privacy disaster at a huge scale.
 
 The danger is in the shape of the failure, not just the number:
 
