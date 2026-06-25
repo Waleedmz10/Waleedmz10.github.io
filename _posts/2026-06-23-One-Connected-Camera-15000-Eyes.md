@@ -112,9 +112,7 @@ Now the system files and the bootloader were sitting on my computer, fully reada
 
 It was about as bad as it gets: the password was written straight into the code — the same on every single device of this type. No per-device value, nothing unique. One password, everywhere.
 
-**Note on what I'm sharing:** I'll say that the password is hardcoded and where it sits, but not the password itself. Printing it would just hand the keys to every device still online. (In my notes: `BOOT_PASSWORD = [REDACTED]`.)
-
-> 📷 Screenshot 8 — the disassembler showing the password check, with the actual value blurred out.
+<img width="1378" height="857" alt="RE_password" src="https://github.com/user-attachments/assets/87762c61-22ae-4e45-a0cc-1426b505b308" />
 
 ## Step 5 — Getting in, but only halfway
 
@@ -124,7 +122,8 @@ From there I changed the startup settings to drop me straight into a basic shell
 
 I needed the real thing: a proper login on a fully running device.
 
-> 📷 Screenshot 9 — the bootloader after login, showing the settings change (hide the password if it shows on screen).
+<img width="1102" height="111" alt="booting_to_shell" src="https://github.com/user-attachments/assets/d5c2aa30-a004-414f-b529-4e6db0edf101" />
+
 
 ## Step 6 — The trick: replacing the password file
 
@@ -134,8 +133,13 @@ The main system files are read-only, so I couldn't edit the real password file (
 
 So I set the admin password to one I picked, saved it to the writable area, and rebooted normally. Now the device boots all the way — everything running, video working, network up — and the admin login accepts my password.
 
-> 📷 Screenshot 10 — the writable settings/startup script, with the line I used highlighted.
-> 📷 Screenshot 11 — a successful admin login on the fully running device.
+The shadow file shown in the screenshot below is the file that I created containing the modified password (created with the same structure as the Linux shadow file).
+
+The run file is the file that runs at boot and can be modified (modified to mount the shadow file on top of the original shadow file of the system).
+
+<img width="616" height="327" alt="config_files" src="https://github.com/user-attachments/assets/2091e498-7ccd-411f-b54e-4c17a71ba149" />
+
+Also you can see in the screenshot above configuration files that contain a lot of useful information such as **(WiFi credentials, user credentials, ...etc)**
 
 ## Step 7 — Full control, full understanding
 
@@ -147,24 +151,28 @@ That main program is where a physical break-in turns into a remote one.
 
 Reverse engineering the main program, I found how it handles its video links — and one hidden link that asks for no password at all. The normal links require a login. This one doesn't. Open a video player, point it at that link, and it just shows the live video. No username, no password.
 
-This is the moment everything changes. Up to here I needed a screwdriver, a soldering iron, and the device in my hands. This needs only a network connection and the link. The hardware work is how I found the bug; the bug itself can be used by anyone who can reach the device over the network.
+This is the moment everything changes. Up to here I needed a screwdriver, a soldering iron, and the device in my hands. This needs only a network connection and the link. The hardware work is how I found the bug; the bug itself can be used by anyone who can reach the device over the network/internet.
 
-**Note on what I'm sharing:** I'll describe the kind of bug (a hidden video link with no password) and how I found it, but I'm not publishing the exact link while devices are still online. (In my notes: `[REDACTED_VIDEO_LINK]`.)
+**Note on what I'm sharing:** I'll describe the kind of bug (a hidden video link with no password), but I'm not publishing the exact link while devices are still online.
 
-> 📷 Screenshot 12 — the disassembler showing the link that skips the password check (blur the actual link).
-> 📷 Screenshot 13 — a video player showing your own device over that link with nothing typed in. Use only your own device.
+I opened VLC media player and connected to my camera (That is protected with a password) with the link I found:
+
+<img width="896" height="657" alt="VLC_open" src="https://github.com/user-attachments/assets/17415f73-50c7-4afa-9909-680a640527d3" />
+
+<img width="1662" height="932" alt="live_screenshot" src="https://github.com/user-attachments/assets/d8c3a700-81da-42b1-9dbb-352c1d76e921" />
 
 ## Step 9 — One spelling mistake, fifteen thousand devices
 
 While reading the device's web server, I noticed something small and very useful: a spelling mistake — an odd, misspelled word in the server's responses that is specific to this exact software and almost certainly unique on the internet.
 
-That mistake is a fingerprint. I built a search around it and ran it against a public internet scan (Censys). The result:
+That mistake is a fingerprint. I built a search around it and ran it against a public internet scan. The result:
 
 **15,000+ devices online running the same software.**
 
-Every one of them has the same hardcoded startup password, the same read-only system, the same writable settings area, and — the part that needs no hardware at all — the same video link with no password. The hardware work gave me the understanding; the software bug plus the fingerprint turned that understanding into a 15,000-device problem.
+<img width="612" height="315" alt="internetscan" src="https://github.com/user-attachments/assets/f7094ec3-0966-471a-9acf-5a3aa93cb16b" />
 
-> 📷 Screenshot 14 — the Censys result showing the count (15,000+). Crop or blur every address, name, location, and the search itself. Show the number, not a list of targets.
+
+Every one of them has the same hardcoded startup password, the same read-only system, the same writable settings area, and — the part that needs no hardware at all — the same video link with no password. The hardware work gave me the understanding; the software bug plus the fingerprint turned that understanding into a 15,000-device problem.
 
 ## What I did not do
 
@@ -182,8 +190,6 @@ The danger is in the shape of the failure, not just the number:
 
 Each step is ordinary on its own. Stacked together, they turn one quiet bench project into an internet-wide problem. Anyone who stops at "we passed the network test" misses this completely — because the root cause sits below the layer they tested, and the damage shows up above it.
 
-> 📷 Screenshot 15 (optional but recommended) — a simple diagram of the chain (clean test → hardware → files → full control → no-password video → fingerprint → 15,000). I can make this as an SVG for you, like the dashcam post.
-
 ## Lessons
 
 **For the people who build these devices:**
@@ -198,5 +204,5 @@ Each step is ordinary on its own. Stacked together, they turn one quiet bench pr
 
 One device on a bench, a soldering iron, and some patient reading turned into 15,000 exposed video feeds across the internet — not because any single step was fancy, but because when every device is identical, one shared flaw is every device's flaw. The hardware was the key; the scale was the door it opened.
 
-Main tools: a UART connection, pulling and copying the memory chip, binwalk, the device's read-only and writable file areas, the bootloader, a disassembler, and a public internet scan.
+Main tools: a UART connection, pulling and copying the firmware, binwalk, the device's read-only and writable file areas, the bootloader, a disassembler, and a public internet scan.
 
